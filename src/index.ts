@@ -15,6 +15,7 @@ app.get('/', (_req, res) => {
   res.send('Afiliado360 API rodando! 🚀');
 });
 
+// ✅ Rota de autenticação: /api/login e /api/register
 app.use('/api', authRoutes);
 
 app.listen(PORT, () => {
