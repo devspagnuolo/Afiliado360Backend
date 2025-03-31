@@ -11,15 +11,15 @@ const PORT = process.env.PORT || 8080;
 app.use(cors());
 app.use(express.json());
 
-// ✅ Teste de saúde da API
+// 🔁 Rota base de saúde
 app.get('/', (_req, res) => {
   res.send('Afiliado360 API rodando! 🚀');
 });
 
-// ✅ Rotas de autenticação: /api/login e /api/register
+// 🔐 Rotas de autenticação
 app.use('/api', authRoutes);
 
-// ✅ Rota de produtos simulados
+// 📦 Produtos mockados (opcional)
 app.get('/api/products', (_req, res) => {
   res.json([
     { id: 1, name: 'Produto A', price: 100 },
