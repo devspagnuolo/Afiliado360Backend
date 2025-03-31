@@ -5,11 +5,11 @@ import jwt from 'jsonwebtoken';
 
 const router = express.Router();
 const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET || 'afiliado360';
+const JWT_SECRET = process.env.JWT_SECRET || 'afiliado360supersecreto';
 
+// 🔐 Login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
-
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return res.status(401).json({ error: 'Usuário não encontrado' });
 
@@ -20,9 +20,9 @@ router.post('/login', async (req, res) => {
   return res.json({ token });
 });
 
+// 🔐 Registro
 router.post('/register', async (req, res) => {
   const { email, password } = req.body;
-
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
