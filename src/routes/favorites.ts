@@ -5,17 +5,13 @@ import { authenticateToken } from '../middleware/authMiddleware';
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// Middleware de autenticação aplicado a todas as rotas abaixo
 router.use(authenticateToken);
 
-// 👉 Criar um favorito
 router.post('/', async (req, res) => {
   const { name, temperature, commission, price, score } = req.body;
   const userId = req.user?.id;
 
-  if (!userId) {
-    return res.status(401).json({ error: 'Usuário não autenticado' });
-  }
+  if (!userId) return res.status(401).json({ error: 'Usuário não autenticado' });
 
   try {
     const favorite = await prisma.favorite.create({
@@ -34,13 +30,10 @@ router.post('/', async (req, res) => {
   }
 });
 
-// 👉 Listar favoritos do usuário
 router.get('/', async (req, res) => {
   const userId = req.user?.id;
 
-  if (!userId) {
-    return res.status(401).json({ error: 'Usuário não autenticado' });
-  }
+  if (!userId) return res.status(401).json({ error: 'Usuário não autenticado' });
 
   try {
     const favorites = await prisma.favorite.findMany({
