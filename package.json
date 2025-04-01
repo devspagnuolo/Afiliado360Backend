@@ -1,11 +1,9 @@
 {
   "name": "afiliado360-backend",
   "version": "1.0.0",
-  "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "ts-node src/index.ts",
     "migrate": "npx prisma migrate dev --name init",
     "generate": "npx prisma generate"
   },
@@ -24,6 +22,7 @@
     "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "^18.17.17",
     "prisma": "^5.7.1",
+    "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.2.2"
   }
