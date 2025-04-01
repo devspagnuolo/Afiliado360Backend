@@ -9,7 +9,9 @@ router.use(authenticateToken);
 
 router.post('/', async (req, res) => {
   const { name, temperature, commission, price, score } = req.body;
-  const userId = req.user.id;
+  const userId = req.user?.id;
+
+  if (!userId) return res.status(401).json({ error: 'Usuário não autenticado' });
 
   try {
     const favorite = await prisma.favorite.create({
@@ -29,7 +31,9 @@ router.post('/', async (req, res) => {
 });
 
 router.get('/', async (req, res) => {
-  const userId = req.user.id;
+  const userId = req.user?.id;
+
+  if (!userId) return res.status(401).json({ error: 'Usuário não autenticado' });
 
   try {
     const favorites = await prisma.favorite.findMany({
