@@ -3,13 +3,6 @@ import axios from 'axios';
 const HOTMART_API_URL = 'https://api-sec-vlc.hotmart.com/product/api/v2/products';
 const TOKEN = process.env.HOTMART_TOKEN;
 
-interface HotmartProduct {
-  name: string;
-  commission_percentage: number;
-  price: number;
-  temperature: number;
-}
-
 export async function fetchHotmartProducts() {
   const response = await axios.get(HOTMART_API_URL, {
     headers: {
