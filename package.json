@@ -2,11 +2,11 @@
   "name": "afiliado360-backend",
   "version": "1.0.0",
   "scripts": {
-    "dev": "ts-node-dev src/index.ts",
-    "start": "ts-node src/index.ts",
-    "migrate": "npx prisma migrate dev --name init",
-    "generate": "npx prisma generate"
-  },
+  "dev": "ts-node-dev src/index.ts",
+  "start": "ts-node src/index.ts",
+  "migrate": "npx prisma migrate dev --name init",
+  "generate": "npx prisma generate"
+},
   "dependencies": {
     "@prisma/client": "^5.7.1",
     "bcrypt": "^5.1.1",
