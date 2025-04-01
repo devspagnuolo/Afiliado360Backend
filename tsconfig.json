@@ -7,4 +7,5 @@
     "esModuleInterop": true
   },
   "include": ["src"]
+  "include": ["src", "src/types"]
 }
