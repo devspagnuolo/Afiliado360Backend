@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
 import productRoutes from './routes/products';
 import hotmartRoutes from './routes/hotmart';
+import favoriteRoutes from './routes/favorites';
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.get('/', (_req, res) => {
 app.use('/api', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/hotmart', hotmartRoutes);
+app.use('/api/favorites', favoriteRoutes);
 
 app.listen(PORT, () => {
   console.log(`🔥 Servidor rodando na porta ${PORT}`);
