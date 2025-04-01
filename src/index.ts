@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
 import productRoutes from './routes/products'; // ✅ nova rota de produtos
+import hotmartRoutes from './routes/hotmart';
 
 dotenv.config();
 
@@ -22,6 +23,8 @@ app.use('/api', authRoutes);
 
 // 📦 Rotas de produtos reais
 app.use('/api/products', productRoutes);
+
+app.use('/api/hotmart', hotmartRoutes);
 
 app.listen(PORT, () => {
   console.log(`🔥 Servidor rodando na porta ${PORT}`);
