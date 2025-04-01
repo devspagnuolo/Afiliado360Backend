@@ -15,10 +15,8 @@ app.get('/', (_req, res) => {
   res.send('Afiliado360 API rodando! 🚀');
 });
 
-// 🔐 Autenticação
 app.use('/api', authRoutes);
 
-// 🛒 Produtos mockados
 app.get('/api/products', (_req, res) => {
   res.json([
     { id: 1, name: 'Produto A', price: 100 },
