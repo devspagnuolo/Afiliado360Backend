@@ -7,5 +7,5 @@
     "strict": true,
     "esModuleInterop": true
   },
-  "include": ["src", "./types/express"]
+  "include": ["src", "scr/types"]
 }
