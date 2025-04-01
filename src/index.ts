@@ -15,7 +15,8 @@ app.get('/', (_req, res) => {
   res.send('Afiliado360 API rodando! 🚀');
 });
 
-app.use('/api', authRoutes); // 👈 Isso garante /api/login e /api/register
+// ⛳️ ATENÇÃO: isso ativa /api/login e /api/register
+app.use('/api', authRoutes);
 
 app.get('/api/products', (_req, res) => {
   res.json([
