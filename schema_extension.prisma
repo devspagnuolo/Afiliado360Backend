@@ -1,0 +1,20 @@
+model Favorite {
+  id          Int      @id @default(autoincrement())
+  name        String
+  temperature Int
+  commission  Float
+  price       Float
+  score       Float
+  createdAt   DateTime @default(now())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  email     String     @unique
+  password  String
+  createdAt DateTime   @default(now())
+  favorites Favorite[]
+}
