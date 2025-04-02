@@ -14,7 +14,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
-    req.user = { id: decoded.userId };
+    req.user = { id: decoded.userId }; // Incluindo `req.user` para ser usado nas rotas
     next();
   } catch {
     return res.status(401).json({ error: 'Token inválido' });
