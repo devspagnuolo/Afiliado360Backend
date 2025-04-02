@@ -7,9 +7,13 @@ const prisma = new PrismaClient();
 
 router.use(authenticateToken);
 
-// Salvar um produto como favorito
+// Salvar favorito
 router.post('/', async (req, res) => {
   const { name, temperature, commission, price, score } = req.body;
+
+  if (!req.user?.id) {
+    return res.status(401).json({ error: 'Usuário não autenticado' });
+  }
 
   if (!name || !temperature || !commission || !price || !score) {
     return res.status(400).json({ error: 'Campos obrigatórios ausentes' });
@@ -23,24 +27,34 @@ router.post('/', async (req, res) => {
         commission,
         price,
         score,
-        userId: req.user!.id
-      }
+        userId: req.user.id,
+      },
     });
 
     res.status(201).json(favorite);
   } catch (error) {
+    console.error('Erro ao salvar favorito:', error);
     res.status(500).json({ error: 'Erro ao salvar favorito' });
   }
 });
 
-// Listar favoritos do usuário logado
+// Listar favoritos
 router.get('/', async (req, res) => {
-  const favorites = await prisma.favorite.findMany({
-    where: { userId: req.user!.id },
-    orderBy: { createdAt: 'desc' }
-  });
+  if (!req.user?.id) {
+    return res.status(401).json({ error: 'Usuário não autenticado' });
+  }
 
-  res.json(favorites);
+  try {
+    const favorites = await prisma.favorite.findMany({
+      where: { userId: req.user.id },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    res.json(favorites);
+  } catch (error) {
+    console.error('Erro ao listar favoritos:', error);
+    res.status(500).json({ error: 'Erro ao listar favoritos' });
+  }
 });
 
 export default router;
