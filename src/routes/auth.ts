@@ -7,52 +7,49 @@ const router = express.Router();
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'afiliado360supersecreto';
 
-// 🔐 Login
+// 🔐 LOGIN
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  console.log('📩 Tentativa de login:', email);
-
   try {
-    const user = await prisma.user.findUnique({ where: { email } });
+    const { email, password } = req.body;
+    console.log('🔍 Recebido login:', email);
 
-    if (!user) {
-      console.warn('❌ Usuário não encontrado:', email);
-      return res.status(401).json({ error: 'Usuário não encontrado' });
+    if (!email || !password) {
+      console.warn('⚠️ Email ou senha faltando');
+      return res.status(400).json({ error: 'E-mail e senha são obrigatórios' });
     }
+
+    const user = await prisma.user.findUnique({ where: { email } });
+    console.log('👤 Usuário encontrado:', user);
+
+    if (!user) return res.status(401).json({ error: 'Usuário não encontrado' });
 
     const valid = await bcrypt.compare(password, user.password);
-    if (!valid) {
-      console.warn('❌ Senha inválida para:', email);
-      return res.status(401).json({ error: 'Senha inválida' });
-    }
+    console.log('🔐 Senha válida?', valid);
+
+    if (!valid) return res.status(401).json({ error: 'Senha inválida' });
 
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
-    console.log('✅ Login bem-sucedido para:', email);
+    console.log('✅ Token gerado com sucesso');
 
     return res.json({ token });
-  } catch (error) {
-    console.error('❗ Erro interno no login:', error);
+  } catch (err) {
+    console.error('❌ Erro interno no login:', err);
     return res.status(500).json({ error: 'Erro interno no servidor' });
   }
 });
 
-// ✅ Registro
+// 📝 REGISTRO
 router.post('/register', async (req, res) => {
   const { email, password } = req.body;
-  console.log('📝 Tentando registrar novo usuário:', email);
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     const user = await prisma.user.create({
       data: { email, password: hashedPassword }
     });
-
-    console.log('✅ Usuário registrado com sucesso:', user.email);
-    return res.status(201).json(user);
-  } catch (error) {
-    console.error('❗ Erro no registro:', error);
-    return res.status(400).json({ error: 'E-mail já cadastrado' });
+    res.json(user);
+  } catch {
+    res.status(400).json({ error: 'E-mail já cadastrado' });
   }
 });
 
