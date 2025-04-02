@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET || 'afiliado360supersecreto';
 
 export const authenticateToken = (
-  req: Request, // Agora usa o tipo global
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
@@ -17,9 +17,10 @@ export const authenticateToken = (
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
-    req.user = { id: decoded.userId }; // Reconhecido globalmente
+    req.user = { id: decoded.userId };
     next();
-  } catch {
+  } catch (error) {
+    console.error('Erro de autenticação:', error);
     res.status(403).json({ error: 'Token inválido' });
   }
 };
