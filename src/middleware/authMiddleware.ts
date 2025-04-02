@@ -3,15 +3,8 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'afiliado360supersecreto';
 
-// ✅ Definindo a interface direto aqui
-interface RequestWithUser extends Request {
-  user?: {
-    id: number;
-  };
-}
-
 export const authenticateToken = (
-  req: RequestWithUser,
+  req: Request, // Agora usa o tipo global
   res: Response,
   next: NextFunction
 ) => {
@@ -24,7 +17,7 @@ export const authenticateToken = (
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
-    req.user = { id: decoded.userId }; // agora reconhecido 💡
+    req.user = { id: decoded.userId }; // Reconhecido globalmente
     next();
   } catch {
     res.status(403).json({ error: 'Token inválido' });
