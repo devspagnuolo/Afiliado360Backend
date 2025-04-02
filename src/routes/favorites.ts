@@ -1,6 +1,6 @@
 import express, { Request } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { authenticateToken } from '../middleware/authMiddleware';
+import authMiddleware from '../middleware/authMiddleware';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -12,7 +12,8 @@ interface RequestWithUser extends Request {
   };
 }
 
-router.use(authenticateToken);
+// 👉 Aplicar middleware para autenticação
+router.use(authMiddleware);
 
 // 👉 Criar favorito
 router.post('/', async (req: RequestWithUser, res) => {
@@ -21,6 +22,10 @@ router.post('/', async (req: RequestWithUser, res) => {
 
   if (!userId) {
     return res.status(401).json({ error: 'Usuário não autenticado' });
+  }
+
+  if (!name || !temperature || !commission || !price || !score) {
+    return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
   }
 
   try {
@@ -36,6 +41,7 @@ router.post('/', async (req: RequestWithUser, res) => {
     });
     res.status(201).json(favorite);
   } catch (err) {
+    console.error('Erro ao salvar favorito:', err);
     res.status(400).json({ error: 'Erro ao salvar favorito' });
   }
 });
@@ -55,6 +61,7 @@ router.get('/', async (req: RequestWithUser, res) => {
     });
     res.json(favorites);
   } catch (err) {
+    console.error('Erro ao buscar favoritos:', err);
     res.status(500).json({ error: 'Erro ao buscar favoritos' });
   }
 });
