@@ -1,27 +1,17 @@
-import express, { Request } from 'express';
+import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { authenticateToken } from '../middleware/authMiddleware';
+import authMiddleware from '../middleware/authMiddleware';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// ✅ Tipagem manual para garantir req.user
-interface RequestWithUser extends Request {
-  user?: {
-    id: number;
-  };
-}
+// Aplica o middleware de autenticação em todas as rotas
+router.use(authMiddleware);
 
-router.use(authenticateToken);
-
-// 👉 Criar favorito
-router.post('/', async (req: RequestWithUser, res) => {
-  const { name, temperature, commission, price, score } = req.body;
+// 🔖 Salvar um produto como favorito
+router.post('/', async (req, res) => {
   const userId = req.user?.id;
-
-  if (!userId) {
-    return res.status(401).json({ error: 'Usuário não autenticado' });
-  }
+  const { name, temperature, commission, price, score } = req.body;
 
   try {
     const favorite = await prisma.favorite.create({
@@ -34,27 +24,27 @@ router.post('/', async (req: RequestWithUser, res) => {
         userId,
       },
     });
+
     res.status(201).json(favorite);
-  } catch (err) {
-    res.status(400).json({ error: 'Erro ao salvar favorito' });
+  } catch (error) {
+    console.error('❗ Erro ao salvar favorito:', error);
+    res.status(500).json({ error: 'Erro ao salvar favorito' });
   }
 });
 
-// 👉 Listar favoritos
-router.get('/', async (req: RequestWithUser, res) => {
+// 📄 Listar favoritos do usuário autenticado
+router.get('/', async (req, res) => {
   const userId = req.user?.id;
-
-  if (!userId) {
-    return res.status(401).json({ error: 'Usuário não autenticado' });
-  }
 
   try {
     const favorites = await prisma.favorite.findMany({
       where: { userId },
-      orderBy: { score: 'desc' },
+      orderBy: { createdAt: 'desc' },
     });
+
     res.json(favorites);
-  } catch (err) {
+  } catch (error) {
+    console.error('❗ Erro ao buscar favoritos:', error);
     res.status(500).json({ error: 'Erro ao buscar favoritos' });
   }
 });
