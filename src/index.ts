@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import './types';
+import '../types';
 import authRoutes from './routes/auth';
 import productRoutes from './routes/products';
 import hotmartRoutes from './routes/hotmart';
