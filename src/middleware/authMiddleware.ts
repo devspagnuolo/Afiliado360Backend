@@ -3,22 +3,15 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'afiliado360supersecreto';
 
-const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization;
+export function authenticateToken(req: Request, res: Response, next: NextFunction) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader?.split(' ')[1];
 
-  if (!authHeader) {
-    return res.status(401).json({ error: 'Token não fornecido' });
-  }
+  if (!token) return res.sendStatus(401);
 
-  const token = authHeader.split(' ')[1];
-
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
-    req.user = { id: decoded.userId }; // Incluindo `req.user` para ser usado nas rotas
+  jwt.verify(token, JWT_SECRET, (err, decoded: any) => {
+    if (err) return res.sendStatus(403);
+    req.user = { id: decoded.userId }; // Aqui o TypeScript precisa saber que 'user' existe
     next();
-  } catch {
-    return res.status(401).json({ error: 'Token inválido' });
-  }
-};
-
-export default authMiddleware;
+  });
+}
