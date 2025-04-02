@@ -3,30 +3,22 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'afiliado360supersecreto';
 
-// ✅ Definindo a interface direto aqui
-interface RequestWithUser extends Request {
-  user?: {
-    id: number;
-  };
-}
+const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
 
-export const authenticateToken = (
-  req: RequestWithUser,
-  res: Response,
-  next: NextFunction
-) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader?.split(' ')[1];
-
-  if (!token) {
+  if (!authHeader) {
     return res.status(401).json({ error: 'Token não fornecido' });
   }
 
+  const token = authHeader.split(' ')[1];
+
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
-    req.user = { id: decoded.userId }; // agora reconhecido 💡
+    req.user = { id: decoded.userId };
     next();
   } catch {
-    res.status(403).json({ error: 'Token inválido' });
+    return res.status(401).json({ error: 'Token inválido' });
   }
 };
+
+export default authMiddleware;
