@@ -11,18 +11,29 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'Nome e preço são obrigatórios' });
   }
 
-  const product = await prisma.product.create({
-    data: { name, price: parseFloat(price), description },
-  });
+  try {
+    const product = await prisma.product.create({
+      data: { name, price: parseFloat(price), description },
+    });
 
-  res.status(201).json(product);
+    res.status(201).json(product);
+  } catch (error) {
+    console.error('Erro ao salvar produto:', error);
+    res.status(500).json({ error: 'Erro ao salvar produto' });
+  }
 });
 
 router.get('/', async (_req, res) => {
-  const products = await prisma.product.findMany({
-    orderBy: { createdAt: 'desc' }
-  });
-  res.json(products);
+  try {
+    const products = await prisma.product.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+
+    res.json(products);
+  } catch (error) {
+    console.error('Erro ao buscar produtos:', error);
+    res.status(500).json({ error: 'Erro ao buscar produtos' });
+  }
 });
 
 export default router;
