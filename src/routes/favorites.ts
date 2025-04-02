@@ -1,17 +1,27 @@
-import express from 'express';
+import express, { Request } from 'express';
 import { PrismaClient } from '@prisma/client';
-import authMiddleware from '../middleware/authMiddleware';
+import { authenticateToken } from '../middleware/authMiddleware';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// Aplica o middleware de autenticação em todas as rotas
-router.use(authMiddleware);
+// ✅ Tipagem manual para garantir req.user
+interface RequestWithUser extends Request {
+  user?: {
+    id: number;
+  };
+}
 
-// 🔖 Salvar um produto como favorito
-router.post('/', async (req, res) => {
-  const userId = req.user?.id;
+router.use(authenticateToken);
+
+// 👉 Criar favorito
+router.post('/', async (req: RequestWithUser, res) => {
   const { name, temperature, commission, price, score } = req.body;
+  const userId = req.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({ error: 'Usuário não autenticado' });
+  }
 
   try {
     const favorite = await prisma.favorite.create({
@@ -24,27 +34,27 @@ router.post('/', async (req, res) => {
         userId,
       },
     });
-
     res.status(201).json(favorite);
-  } catch (error) {
-    console.error('❗ Erro ao salvar favorito:', error);
-    res.status(500).json({ error: 'Erro ao salvar favorito' });
+  } catch (err) {
+    res.status(400).json({ error: 'Erro ao salvar favorito' });
   }
 });
 
-// 📄 Listar favoritos do usuário autenticado
-router.get('/', async (req, res) => {
+// 👉 Listar favoritos
+router.get('/', async (req: RequestWithUser, res) => {
   const userId = req.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({ error: 'Usuário não autenticado' });
+  }
 
   try {
     const favorites = await prisma.favorite.findMany({
       where: { userId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { score: 'desc' },
     });
-
     res.json(favorites);
-  } catch (error) {
-    console.error('❗ Erro ao buscar favoritos:', error);
+  } catch (err) {
     res.status(500).json({ error: 'Erro ao buscar favoritos' });
   }
 });
