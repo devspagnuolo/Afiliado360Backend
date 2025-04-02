@@ -8,16 +8,25 @@ const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'afiliado360supersecreto';
 
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) return res.status(401).json({ error: 'Usuário não encontrado' });
+    if (!email || !password) {
+      return res.status(400).json({ error: 'E-mail e senha são obrigatórios' });
+    }
 
-  const valid = await bcrypt.compare(password, user.password);
-  if (!valid) return res.status(401).json({ error: 'Senha inválida' });
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) return res.status(401).json({ error: 'Usuário não encontrado' });
 
-  const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
-  res.json({ token });
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) return res.status(401).json({ error: 'Senha inválida' });
+
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
+    return res.json({ token });
+  } catch (err) {
+    console.error('❌ Erro interno no login:', err);
+    return res.status(500).json({ error: 'Erro interno no servidor' });
+  }
 });
 
 router.post('/register', async (req, res) => {
